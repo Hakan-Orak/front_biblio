@@ -1,156 +1,140 @@
 <template>
-	<div id="header">
+  <div>
 
-    <nav class="navbar navbar-expand-lg">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <i class="fas fa-film mr-2"></i>
-          Giga projet Java
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link nav-link-1 active" aria-current="page" @click="$router.push('/')">Photos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-link-2" >Videos</a>
-            </li>
-
-            <li v-if="userConnect.profil == 'ADMIN'" class="nav-item">
-              <a @click="$router.push('/gestion-images')" class="nav-link nav-link-3" >GESTION IMAGES</a>
-            </li>
-
-
-            <li v-if="connexion == false" class="nav-item">
-              <a @click="openConnexion" class="nav-link nav-link-4">Connexion</a>
-            </li>
-
-            <li v-if="connexion == true" class="nav-item">
-              <a  @click="$router.push('/add-picture')" class="nav-link nav-link-4">Ajouter une image</a>
-            </li>
-
-
-            <li v-if="connexion == true" class="nav-item">
-              <a @click="deconnecte" class="nav-link nav-link-4">Déconnexion</a>
-            </li>
-
-
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-
-
-    <modal name="connect">
-      <div class="modal-body">
-        <div class="form-title text-center">
-          <h4>Login</h4>
-        </div>
-        <div class="d-flex flex-column text-center">
+    <div class="container-fluid tm-mt-60">
+      <div class="row tm-mb-50">
+        <div class="col-lg-12 col-12 mb-5">
+          <h2 class="tm-text-primary mb-5">Inscription</h2>
+          <div class="tm-contact-form mx-auto">
 
             <div class="form-group">
-              <input type="email" v-model="inputEmail" class="form-control" placeholder="Votre Email">
+              <input type="text" v-model="inputNom" class="form-control rounded-0" placeholder="Votre nom" required />
             </div>
+
             <div class="form-group">
-              <input type="password" v-model="inputPassword" class="form-control" id="password1" placeholder="Mot de passe">
+              <input type="text" v-model="inputPrenom" class="form-control rounded-0" placeholder="Votre prénom" required />
             </div>
-            <button @click="connexionUser" type="button" class="btn btn-info btn-block btn-round">Connexion</button>
+
+            <div class="form-group">
+              <input type="email" v-model="inputEmail" class="form-control rounded-0" placeholder="Email" required />
+            </div>
+
+            <div class="form-group">
+              <input type="password" v-model="inputPassword" class="form-control rounded-0" placeholder="Votre mot de passe"  />
+            </div>
+
+            <div class="form-group">
+              <input type="password" v-model="inputPasswordVerif" class="form-control rounded-0" placeholder="Votre mot de passe"  />
+            </div>
 
 
+
+<!--            <div class="form-group">-->
+<!--              <select class="form-control" id="contact-select" name="inquiry">-->
+<!--                <option value="-">Subject</option>-->
+<!--                <option value="sales">Sales &amp; Marketing</option>-->
+<!--                <option value="creative">Creative Design</option>-->
+<!--                <option value="uiux">UI / UX</option>-->
+<!--              </select>-->
+<!--            </div>-->
+
+
+<!--            <div class="form-group">-->
+<!--              <textarea rows="8" name="message" class="form-control rounded-0" placeholder="Message"></textarea>-->
+<!--            </div>-->
+            <div class="form-group tm-text-right">
+              <button @click="sendIncription"  class="btn btn-primary">S'inscrire !</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="modal-footer d-flex justify-content-center">
-        <div class="signup-section">Vous n'êtes pas inscrit ? <a @click="redirectInscription" class="text-info"> Inscrivez-vous</a>.</div>
-      </div>
-
-    </modal>
+    </div> <!-- container-fluid, tm-container-content -->
 
 
   </div>
 </template>
 
+
 <script>
 
 import axios from 'axios';
-import Vue from 'vue'
-import VModal from 'vue-js-modal'
-Vue.use(VModal)
-
 
 
 export default {
   data() {
     return {
-      dataImages : [],
-      user : [],
-      connexion : false,
+      inputNom : "",
+      inputPrenom : "",
       inputEmail : "",
       inputPassword : "",
-      userConnect : []
+      inputPasswordVerif : "",
+
     };
   },
   created() {
     axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
-    if (localStorage.getItem("user") != "") {
-      this.user = localStorage.getItem("user")
-      console.log("BG")
-      console.log(JSON.parse(this.user))
-      this.connexion = true
-      this.userConnect = JSON.parse(this.user)
-    }
-
   },
   mounted() {
-
-
+    // console.log("Ici")
+    //
+    //
+    // let id = localStorage.getItem("idPhotoClick")
+    // axios.get("http://localhost:8085/api/v1/images/"+ id, {
+    //   headers: {
+    //     'Access-Control-Allow-Origin': '*',
+    //   }
+    // })
+    //     .then(responseDataImage => {
+    //       console.log("DATA IMAGES")
+    //       console.log(responseDataImage.data)
+    //       this.imageData = responseDataImage.data
+    //     })
+    //     .catch(error => {
+    //       console.log("erreur")
+    //       console.log(error)
+    //     })
   },
   methods: {
-    openConnexion(){
-      this.$modal.show('connect');
-    },
-    deconnecte(){
-      localStorage.setItem("user", "")
-      this.connexion = false
+
+    goodFormatDate(dateFormat){
+      let dateGoodFormat = dateFormat.split("-")
+
+      return dateGoodFormat[2]+"/"+dateGoodFormat[1]+"/"+dateGoodFormat[0]
 
     },
-    connexionUser() {
 
-      axios.get("http://localhost:8085/api/v1/users/mail/" + this.inputEmail, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        }
-      })
-          .then(responseConnexion => {
-            console.log("Connexion data")
-            console.log(responseConnexion.data)
-            if (responseConnexion.data.password == this.inputPassword) {
-              alert("Bonjour " + responseConnexion.data.nom + " " + responseConnexion.data.prenom)
-              this.connexion = true
+    sendIncription() {
 
+      if(this.inputNom !== "" && this.inputPrenom !== "" && this.inputEmail !== "" && this.inputPassword !== "" && this.inputPassword === this.inputPasswordVerif ) {
+        alert("Salut")
 
-              localStorage.setItem("user", JSON.stringify(responseConnexion.data))
+        axios.post("http://localhost:8085/api/v1/users", {
+          "nom": this.inputNom,
+          "prenom": this.inputPrenom,
+          "email": this.inputEmail,
+          "password": this.inputPassword,
+          "profil": "CLIENT",
 
-              this.$modal.hide('connect');
+          headers: {
+            'Access-Control-Allow-Origin': '*',
+          },
+        })
+            .then(responseInscription => {
+              console.log("POST REALISER")
+              console.log(responseInscription.data)
+              localStorage.setItem("user", JSON.stringify(responseInscription.data))
+            })
+            .catch(error => {
+              console.log("erreur")
+              console.log(error)
+            })
+      } else {
+        alert("pas salut")
+      }
 
-            } else {
-              alert("Problème de connexion")
-            }
-          })
-          .catch(error => {
-            console.log("erreur")
-            console.log(error)
-          })
-
-    },
-    redirectInscription() {
-      this.$router.push('/inscription');
-      this.$modal.hide('connect');
     }
+
 
   },
   components: {

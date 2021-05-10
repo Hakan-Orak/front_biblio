@@ -12,11 +12,6 @@
     </div>
 
 
-
-
-
-
-
     <div class="container-fluid tm-container-content tm-mt-60">
       <div class="row mb-4">
         <h2 class="col-3 tm-text-primary">
@@ -29,7 +24,8 @@
 
         <div v-for="img in dataImages" :key="img.id" >
 
-
+        <div>
+<!--        <div v-if="img.datapublic === 'true'">-->
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12" @click="photoDetailsDirector(img.id)">
           <figure class="effect-ming tm-video-item">
             <img :src="require('../assets/photos/moyen-' + img.chemin)" alt="Image" class="img-fluid">
@@ -43,9 +39,8 @@
           </div>
         </div>
 
+        </div>
       </div>
-
-
 
 
 
@@ -94,6 +89,24 @@ export default {
       console.log("erreur")
       console.log(error)
     })
+
+
+    axios.get("http://localhost:8082/oui", {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
+        .then(responseData => {
+          console.log("REGARDE ICI BG")
+          console.log(responseData.data)
+        })
+        .catch(error => {
+          console.log("erreur 2")
+          console.log(error)
+        })
+
+
+
   },
   methods: {
 

@@ -1,7 +1,10 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import Home from "../views/Home.vue";
-import PhotoDetails from "../views/photoDetails"
+import PhotoDetails from "../views/photoDetails";
+import Inscription from "../views/inscription";
+import addPicture from "../views/addPicture";
+import gestionImages from "../views/gestionImages";
 
 Vue.use(VueRouter);
 
@@ -15,6 +18,21 @@ const routes = [
     path: "/photo-details",
     name: "photoDetails",
     component: PhotoDetails,
+  },
+  {
+    path: "/inscription",
+    name: "inscription",
+    component: Inscription,
+  },
+  {
+    path: "/add-picture",
+    name: "addPicture",
+    component: addPicture,
+  },
+  {
+    path: "/gestion-images",
+    name: "gestionImages",
+    component: gestionImages,
   }
 ];
 

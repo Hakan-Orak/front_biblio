@@ -1,155 +1,102 @@
 <template>
-	<div id="header">
-
-    <nav class="navbar navbar-expand-lg">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <i class="fas fa-film mr-2"></i>
-          Giga projet Java
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link nav-link-1 active" aria-current="page" @click="$router.push('/')">Photos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-link-2" >Videos</a>
-            </li>
-
-            <li v-if="userConnect.profil == 'ADMIN'" class="nav-item">
-              <a @click="$router.push('/gestion-images')" class="nav-link nav-link-3" >GESTION IMAGES</a>
-            </li>
+  <div>
 
 
-            <li v-if="connexion == false" class="nav-item">
-              <a @click="openConnexion" class="nav-link nav-link-4">Connexion</a>
-            </li>
-
-            <li v-if="connexion == true" class="nav-item">
-              <a  @click="$router.push('/add-picture')" class="nav-link nav-link-4">Ajouter une image</a>
-            </li>
 
 
-            <li v-if="connexion == true" class="nav-item">
-              <a @click="deconnecte" class="nav-link nav-link-4">Déconnexion</a>
-            </li>
 
 
-          </ul>
+    <div class="container-fluid tm-container-content tm-mt-60">
+      <div class="row mb-4">
+        <h2 class="col-3 tm-text-primary">
+          Latest Photos
+        </h2>
+        <div class="col-6 d-flex justify-content-end align-items-center">
         </div>
       </div>
-    </nav>
+      <div class="row tm-mb-90 tm-gallery">
 
+        <div v-for="img in dataImages" :key="img.id" >
 
-
-    <modal name="connect">
-      <div class="modal-body">
-        <div class="form-title text-center">
-          <h4>Login</h4>
-        </div>
-        <div class="d-flex flex-column text-center">
-
-            <div class="form-group">
-              <input type="email" v-model="inputEmail" class="form-control" placeholder="Votre Email">
+          <div v-if="img.datapublic === 'true'">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12" @click="photoDetailsDirector(img.id)">
+              <figure class="effect-ming tm-video-item">
+                <img :src="require('../assets/photos/moyen-' + img.chemin)" alt="Image" class="img-fluid">
+                <figcaption class="d-flex align-items-center justify-content-center">
+                  <h2>Peace</h2>
+                </figcaption>
+              </figure>
+              <div class="d-flex justify-content-between tm-text-gray">
+                <span class="tm-text-gray-light">{{ goodFormatDate(img.datepublication) }}</span>
+                <span>21,204 views</span>
+              </div>
             </div>
-            <div class="form-group">
-              <input type="password" v-model="inputPassword" class="form-control" id="password1" placeholder="Mot de passe">
-            </div>
-            <button @click="connexionUser" type="button" class="btn btn-info btn-block btn-round">Connexion</button>
 
-
+          </div>
         </div>
-      </div>
-      <div class="modal-footer d-flex justify-content-center">
-        <div class="signup-section">Vous n'êtes pas inscrit ? <a @click="redirectInscription" class="text-info"> Inscrivez-vous</a>.</div>
-      </div>
 
-    </modal>
+
+
+      </div> <!-- row -->
+    </div> <!-- container-fluid, tm-container-content -->
+
+
+
+
+
+
 
 
   </div>
 </template>
 
+
 <script>
 
 import axios from 'axios';
-import Vue from 'vue'
-import VModal from 'vue-js-modal'
-Vue.use(VModal)
-
 
 
 export default {
   data() {
     return {
-      dataImages : [],
-      user : [],
-      connexion : false,
-      inputEmail : "",
-      inputPassword : "",
-      userConnect : []
+      dataImages : []
     };
   },
   created() {
     axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 
-    if (localStorage.getItem("user") != "") {
-      this.user = localStorage.getItem("user")
-      console.log("BG")
-      console.log(JSON.parse(this.user))
-      this.connexion = true
-      this.userConnect = JSON.parse(this.user)
-    }
-
   },
   mounted() {
-
-
+    console.log("Ici")
+    axios.get("http://localhost:8085/api/v1/images", {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
+        .then(responseDataImage => {
+          console.log("DATA IMAGES")
+          console.log(responseDataImage.data)
+          this.dataImages = responseDataImage.data
+        })
+        .catch(error => {
+          console.log("erreur")
+          console.log(error)
+        })
   },
   methods: {
-    openConnexion(){
-      this.$modal.show('connect');
-    },
-    deconnecte(){
-      localStorage.setItem("user", "")
-      this.connexion = false
+
+    goodFormatDate(dateFormat){
+      let dateGoodFormat = dateFormat.split("-")
+
+      return dateGoodFormat[2]+"/"+dateGoodFormat[1]+"/"+dateGoodFormat[0]
 
     },
-    connexionUser() {
+    photoDetailsDirector(id){
+      console.log("Id de l'image bg")
+      console.log(id)
 
-      axios.get("http://localhost:8085/api/v1/users/mail/" + this.inputEmail, {
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-        }
-      })
-          .then(responseConnexion => {
-            console.log("Connexion data")
-            console.log(responseConnexion.data)
-            if (responseConnexion.data.password == this.inputPassword) {
-              alert("Bonjour " + responseConnexion.data.nom + " " + responseConnexion.data.prenom)
-              this.connexion = true
-
-
-              localStorage.setItem("user", JSON.stringify(responseConnexion.data))
-
-              this.$modal.hide('connect');
-
-            } else {
-              alert("Problème de connexion")
-            }
-          })
-          .catch(error => {
-            console.log("erreur")
-            console.log(error)
-          })
-
-    },
-    redirectInscription() {
-      this.$router.push('/inscription');
-      this.$modal.hide('connect');
+      localStorage.setItem("idPhotoClick", id)
+      this.$router.push('/photo-details')
     }
 
   },

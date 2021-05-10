@@ -1,100 +1,93 @@
 <template>
-	<div id="header">
-
-    <nav class="navbar navbar-expand-lg">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <i class="fas fa-film mr-2"></i>
-          Giga projet Java
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav ml-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link nav-link-1 active" aria-current="page" @click="$router.push('/')">Photos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link nav-link-2" >Videos</a>
-            </li>
-
-            <li v-if="userConnect.profil == 'ADMIN'" class="nav-item">
-              <a @click="$router.push('/gestion-images')" class="nav-link nav-link-3" >GESTION IMAGES</a>
-            </li>
-
-
-            <li v-if="connexion == false" class="nav-item">
-              <a @click="openConnexion" class="nav-link nav-link-4">Connexion</a>
-            </li>
-
-            <li v-if="connexion == true" class="nav-item">
-              <a  @click="$router.push('/add-picture')" class="nav-link nav-link-4">Ajouter une image</a>
-            </li>
-
-
-            <li v-if="connexion == true" class="nav-item">
-              <a @click="deconnecte" class="nav-link nav-link-4">Déconnexion</a>
-            </li>
-
-
-          </ul>
-        </div>
+  <div v-if="connexion == true">
+    <div class="container-fluid tm-container-content tm-mt-60">
+      <div class="row mb-4">
+        <h2 class="col-12 tm-text-primary">Ajouter votre image</h2>
       </div>
-    </nav>
+      <div class="row tm-mb-90">
+
+        <div class=" col-12 col-xl-12 col-lg-12 col-md-12 col-sm-12">
+          <div class="tm-bg-gray tm-video-details">
 
 
+            <div class="container-fluid tm-mt-60">
+              <div class="row tm-mb-50">
+                <div class="col-lg-12 col-12 mb-5">
+                  <h2 class="tm-text-primary mb-5">Veuillez remplir le formulaire pour ajouter votre image</h2>
+                  <div class="tm-contact-form mx-auto">
+                    <div class="form-group">
+                      <input type="file" @change="previewFiles" multiple>
+                    </div>
+                    <div class="form-group">
+                      <textarea rows="8" v-model="inputDescription" class="form-control rounded-0" placeholder="Description de votre image" required></textarea>
+                    </div>
 
-    <modal name="connect">
-      <div class="modal-body">
-        <div class="form-title text-center">
-          <h4>Login</h4>
-        </div>
-        <div class="d-flex flex-column text-center">
-
-            <div class="form-group">
-              <input type="email" v-model="inputEmail" class="form-control" placeholder="Votre Email">
+                    <div class="form-group tm-text-right">
+                      <button @click="sendData" type="submit" class="btn btn-primary">Send</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="form-group">
-              <input type="password" v-model="inputPassword" class="form-control" id="password1" placeholder="Mot de passe">
+
+
+            <div class="text-center mb-5">
+              <a href="#" class="btn btn-primary tm-btn-big">Download</a>
             </div>
-            <button @click="connexionUser" type="button" class="btn btn-info btn-block btn-round">Connexion</button>
 
 
+<!--            <div>-->
+<!--              <h3 class="tm-text-gray-dark mb-3">Tags</h3>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Cloud</a>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Bluesky</a>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Nature</a>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Background</a>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Timelapse</a>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Night</a>-->
+<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Real Estate</a>-->
+<!--            </div>-->
+          </div>
         </div>
       </div>
-      <div class="modal-footer d-flex justify-content-center">
-        <div class="signup-section">Vous n'êtes pas inscrit ? <a @click="redirectInscription" class="text-info"> Inscrivez-vous</a>.</div>
-      </div>
 
-    </modal>
+    </div>
 
+
+
+
+  </div>
+
+  <div v-else>
+    <p>Veuillez vous connecter !</p>
 
   </div>
 </template>
 
+
 <script>
 
 import axios from 'axios';
-import Vue from 'vue'
-import VModal from 'vue-js-modal'
-Vue.use(VModal)
-
 
 
 export default {
   data() {
     return {
-      dataImages : [],
-      user : [],
+      imageData : [],
+      formatImage : "moyen",
       connexion : false,
-      inputEmail : "",
-      inputPassword : "",
-      userConnect : []
+      userConnect : [],
+      inputImage : [],
+      inputChemin : "",
+      inputDescription : "",
+      inputDatapublic : "false"
     };
   },
   created() {
     axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+
+  },
+  mounted() {
+
 
     if (localStorage.getItem("user") != "") {
       this.user = localStorage.getItem("user")
@@ -104,52 +97,69 @@ export default {
       this.userConnect = JSON.parse(this.user)
     }
 
-  },
-  mounted() {
 
 
+
+    console.log("Ici")
+
+
+    // let id = localStorage.getItem("idPhotoClick")
+    // axios.get("http://localhost:8085/api/v1/images/"+ id, {
+    //   headers: {
+    //     'Access-Control-Allow-Origin': '*',
+    //   }
+    // })
+    //     .then(responseDataImage => {
+    //       console.log("DATA IMAGES")
+    //       console.log(responseDataImage.data)
+    //       this.imageData = responseDataImage.data
+    //     })
+    //     .catch(error => {
+    //       console.log("erreur")
+    //       console.log(error)
+    //     })
   },
   methods: {
-    openConnexion(){
-      this.$modal.show('connect');
-    },
-    deconnecte(){
-      localStorage.setItem("user", "")
-      this.connexion = false
+
+    goodFormatDate(dateFormat){
+      let dateGoodFormat = dateFormat.split("-")
+
+      return dateGoodFormat[2]+"/"+dateGoodFormat[1]+"/"+dateGoodFormat[0]
 
     },
-    connexionUser() {
+    previewFiles(event) {
+      console.log(event.target.files);
+      this.inputImage = event.target.files[0]
+    },
+    sendData() {
+      this.inputChemin = this.inputImage.name
+      console.log("Notre image")
+      console.log(this.inputChemin)
 
-      axios.get("http://localhost:8085/api/v1/users/mail/" + this.inputEmail, {
+
+
+      const formData = new FormData();
+      formData.append('imageFile',this.inputImage , this.inputImage.name);
+      formData.append('chemin',this.inputChemin)
+      formData.append('description',this.inputDescription)
+
+
+
+      axios.post("http://localhost:8085/api/v1/images",formData, {
         headers: {
           'Access-Control-Allow-Origin': '*',
-        }
+        },
       })
-          .then(responseConnexion => {
-            console.log("Connexion data")
-            console.log(responseConnexion.data)
-            if (responseConnexion.data.password == this.inputPassword) {
-              alert("Bonjour " + responseConnexion.data.nom + " " + responseConnexion.data.prenom)
-              this.connexion = true
-
-
-              localStorage.setItem("user", JSON.stringify(responseConnexion.data))
-
-              this.$modal.hide('connect');
-
-            } else {
-              alert("Problème de connexion")
-            }
+          .then(responseData => {
+            console.log("POST REALISER")
+            console.log(responseData.data)
+            // localStorage.setItem("user", JSON.stringify(responseData.data))
           })
           .catch(error => {
             console.log("erreur")
             console.log(error)
           })
 
-    },
-    redirectInscription() {
-      this.$router.push('/inscription');
-      this.$modal.hide('connect');
     }
 
   },
