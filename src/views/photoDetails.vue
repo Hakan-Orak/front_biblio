@@ -6,17 +6,17 @@
       </div>
       <div class="row tm-mb-90">
         <div class="col-8">
-        <div v-if="formatImage == 'petit'" class="col-xl-8 col-lg-7 col-md-6 col-sm-12">
-          <img :src="require('../assets/photos/petit-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
-        </div>
+          <div v-if="formatImage == 'petit'" class="col-xl-8 col-lg-7 col-md-6 col-sm-12">
+            <img :src="require('../assets/photos/petit-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
+          </div>
 
           <div v-if="formatImage == 'moyen'" class="col-xl-8 col-lg-7 col-md-6 col-sm-12">
             <img :src="require('../assets/photos/moyen-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
-        </div>
+          </div>
 
           <div v-if="formatImage == 'grand'" class="col-xl-8 col-lg-7 col-md-6 col-sm-12">
             <img :src="require('../assets/photos/grand-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
-        </div>
+          </div>
 
         </div>
 
@@ -33,7 +33,11 @@
             </ul>
 
             <div class="text-center mb-5">
-              <a href="#" class="btn btn-primary tm-btn-big">Download</a>
+              <a @click="downloadpicture" class="btn btn-primary tm-btn-big">Download</a>
+            </div>
+
+            <div class="text-center mb-5">
+              <a @click="downloadZippicture" class="btn btn-primary tm-btn-big">ZIP DOWNLOAD</a>
             </div>
 
             <div class="mb-4">
@@ -57,6 +61,11 @@
     </div>
 
 
+    <div style="display: none">
+      <img id="small_picture" :src="require('../assets/photos/petit-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
+      <img id="middle_picture" :src="require('../assets/photos/moyen-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
+      <img id="big_picture" :src="require('../assets/photos/grand-' + imageData.chemin)" alt="Image" style="margin-bottom: 10%" class="img-fluid">
+    </div>
 
 
   </div>
@@ -66,13 +75,17 @@
 <script>
 
 import axios from 'axios';
+import jszip from 'jszip';
+import { saveAs } from 'file-saver';
+
 
 
 export default {
   data() {
     return {
       imageData : [],
-      formatImage : "moyen"
+      formatImage : "moyen",
+      formatCheminDl : "",
     };
   },
   created() {
@@ -113,6 +126,105 @@ export default {
 
       localStorage.setItem("idPhotoClick", id)
       this.$router.push('/photo-details')
+    },
+    downloadpicture(){
+
+
+
+      if (this.formatImage == 'petit') {
+        this.formatCheminDl = "petit"
+      } else if (this.formatImage == 'moyen') {
+        this.formatCheminDl = "moyen"
+      } else if (this.formatImage == 'grand') {
+        this.formatCheminDl = "grand"
+      }
+
+      let pictureLink = require('../assets/photos/'+ this.formatCheminDl +'-' + this.imageData.chemin)
+      console.log(pictureLink)
+
+      var fileURL = 'http://localhost:8082' + pictureLink;
+      var fileLink = document.createElement('a');
+
+      console.log();
+
+      console.log(fileURL);
+      console.log(fileLink);
+      fileLink.href = fileURL;
+      fileLink.setAttribute('download', this.imageData.chemin);
+      document.body.appendChild(fileLink);
+
+      fileLink.click();
+
+    },
+
+
+    downloadZippicture(){
+      let zip = new jszip();
+      zip.file("Hello.txt", "Hello World\n");
+
+      if (this.formatImage == 'petit') {
+        this.formatCheminDl = "petit"
+      } else if (this.formatImage == 'moyen') {
+        this.formatCheminDl = "moyen"
+      } else if (this.formatImage == 'grand') {
+        this.formatCheminDl = "grand"
+      }
+
+
+
+
+
+
+
+
+
+
+
+
+
+      zip.file("Goodbye.txt", "Goodbye, cruel world\n");
+      let middle_picture = document.getElementById('middle_picture')
+      let small_picture = document.getElementById('small_picture')
+      let big_picture = document.getElementById('big_picture')
+      // .getAttribute("data");
+      let dataImage_middle = this.getBase64Image(middle_picture)
+      let dataImage_small = this.getBase64Image(small_picture)
+      let dataImage_big = this.getBase64Image(big_picture)
+
+
+
+      console.log(dataImage_middle.width)
+
+      var img = zip.folder("images");
+      img.file("middle_" + this.imageData.chemin , dataImage_middle , {base64: true});
+      img.file("small_" + this.imageData.chemin , dataImage_small , {base64: true});
+      img.file("big_" + this.imageData.chemin , dataImage_big , {base64: true});
+
+
+      zip.generateAsync({type:"blob"})
+          .then(function(content) {
+            // see FileSaver.js
+            saveAs(content, "images.zip");
+          });
+    },
+
+    getBase64Image(img) {
+      // Create an empty canvas element
+      var canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Copy the image contents to the canvas
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      // Get the data-URL formatted image
+      // Firefox supports PNG and JPEG. You could check img.src to
+      // guess the original format, but be aware the using "image/jpg"
+      // will re-encode the image.
+      var dataURL = canvas.toDataURL("image/png");
+
+      return dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
     }
 
   },

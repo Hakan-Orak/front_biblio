@@ -89,6 +89,8 @@ export default {
   mounted() {
 
 
+
+
     if (localStorage.getItem("user") != "") {
       this.user = localStorage.getItem("user")
       console.log("BG")
@@ -100,8 +102,35 @@ export default {
 
 
 
+
+    const formDataCategorie = new FormData();
+    formDataCategorie.append('idimage',4);
+    formDataCategorie.append('libelle',"beurk");
+
+
+
+
+
+
+
     console.log("Ici")
 
+
+
+    axios.get("http://localhost:8082/upload_img=moyen-"+"39624.jpg", {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
+      .then(responseData => {
+        console.log("Get antoines data")
+        console.log(responseData.data.result.tags)
+
+      })
+      .catch(error => {
+        console.log("erreur")
+        console.log(error)
+      })
 
     // let id = localStorage.getItem("idPhotoClick")
     // axios.get("http://localhost:8085/api/v1/images/"+ id, {
@@ -153,7 +182,43 @@ export default {
           .then(responseData => {
             console.log("POST REALISER")
             console.log(responseData.data)
-            // localStorage.setItem("user", JSON.stringify(responseData.data))
+
+
+
+
+
+
+
+            //------------------ AJOUT DES CATEGORIES ---------------------------//
+
+            axios.post("http://localhost:8085/api/v1/categories", {
+              "idimage": 4,
+              "libelle": "beurk",
+
+              headers: {
+                'Access-Control-Allow-Origin': '*',
+              },
+            })
+                .then(responseData => {
+                  console.log("POST CATEGORIE REALISER")
+                  console.log(responseData.data)
+
+
+                })
+                .catch(error => {
+                  console.log("erreur")
+                  console.log(error)
+                })
+
+
+
+
+
+
+
+
+
+
           })
           .catch(error => {
             console.log("erreur")

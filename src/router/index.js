@@ -5,6 +5,7 @@ import PhotoDetails from "../views/photoDetails";
 import Inscription from "../views/inscription";
 import addPicture from "../views/addPicture";
 import gestionImages from "../views/gestionImages";
+import sqdfqsfqdsfqdsl from "../views/test";
 
 Vue.use(VueRouter);
 
@@ -33,6 +34,11 @@ const routes = [
     path: "/gestion-images",
     name: "gestionImages",
     component: gestionImages,
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: sqdfqsfqdsfqdsl,
   }
 ];
 

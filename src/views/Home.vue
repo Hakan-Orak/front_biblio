@@ -23,24 +23,23 @@
       <div class="row tm-mb-90 tm-gallery">
 
         <div v-for="img in dataImages" :key="img.id" >
+<!--          v-if="img.datapublic === 'true'"-->
+          <div >
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12" @click="photoDetailsDirector(img.id)">
+              <figure class="effect-ming tm-video-item">
+                <img :src="require('../assets/photos/moyen-' + img.chemin)" alt="Image" class="img-fluid">
+                <figcaption class="d-flex align-items-center justify-content-center">
+                  <h2>Peace</h2>
+                </figcaption>
+              </figure>
+              <div class="d-flex justify-content-between tm-text-gray">
+                <span class="tm-text-gray-light">{{ goodFormatDate(img.datepublication) }}</span>
+                <span>21,204 views</span>
+              </div>
+            </div>
 
-        <div>
-<!--        <div v-if="img.datapublic === 'true'">-->
-        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12" @click="photoDetailsDirector(img.id)">
-          <figure class="effect-ming tm-video-item">
-            <img :src="require('../assets/photos/moyen-' + img.chemin)" alt="Image" class="img-fluid">
-            <figcaption class="d-flex align-items-center justify-content-center">
-              <h2>Peace</h2>
-            </figcaption>
-          </figure>
-          <div class="d-flex justify-content-between tm-text-gray">
-            <span class="tm-text-gray-light">{{ goodFormatDate(img.datepublication) }}</span>
-            <span>21,204 views</span>
           </div>
         </div>
-
-        </div>
-      </div>
 
 
 
