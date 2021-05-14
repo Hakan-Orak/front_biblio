@@ -3,43 +3,93 @@
 
 
 
+    <table class="table">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+        <th scope="col">Handle</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr v-for="img in dataImages">
+        <th scope="row">{{ img.id }}</th>
+        <td>{{ img.chemin }}</td>
+        <td>{{ img.datepublication }}</td>
+        <td>{{ img.description }}</td>
+        <td @click="printImage(img)" ><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+          <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+          <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
+        </svg></td>
+        <td  v-if="img.datapublic== 'false'"><button @click="imageAccess(img)" type="button" class="btn btn-success">Activé</button></td>
+        <td  v-else="img.datapublic== 'false'"><button @click="imageAccess(img)" type="button" class="btn btn-danger">Désactivé</button></td>
+
+        <td><button @click="modifePopup(img)" type="button" class="btn btn-success">Modifier</button></td>
+        <td><button @click="suppImage(img)" type="button" class="btn btn-danger">Supprimer</button></td>
+      </tr>
+
+      </tbody>
+    </table>
 
 
 
-    <div class="container-fluid tm-container-content tm-mt-60">
-      <div class="row mb-4">
-        <h2 class="col-3 tm-text-primary">
-          Latest Photos
-        </h2>
-        <div class="col-6 d-flex justify-content-end align-items-center">
+
+          <div v-if="firstSelect == 'true'">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12">
+                <img :src="require('../assets/photos/moyen-' + imageSelect.chemin)" alt="Image" class="img-fluid">
+            </div>
+          </div>
+
+    <br/>
+    <br/>
+
+
+
+
+
+
+
+    <modal name="modife" :width="1000" :height="1000">
+      <div class="modal-body">
+        <div class="form-title text-center">
+          <h4>Login</h4>
+        </div>
+        <div class="d-flex flex-column text-center">
+
+          <div class="form-group">
+            <textarea rows="8" class="form-control rounded-0" v-model="imageSelectCrud.description" placeholder="Description de votre image"></textarea>
+          </div>
+          <div class="form-group">
+            <input type="date" v-model="imageSelectCrud.datepublication"  class="form-control" placeholder="Date enregistrement">
+          </div>
+
+
+          <button @click="modifieData" type="button" class="btn btn-info btn-block btn-round">Modifier</button>
+
+
         </div>
       </div>
-      <div class="row tm-mb-90 tm-gallery">
+    </modal>
 
-        <div v-for="img in dataImages" :key="img.id" >
 
-<!--          <div>-->
-<!--            &lt;!&ndash;        <div v-if="img.datapublic === 'true'">&ndash;&gt;-->
-<!--            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12" @click="photoDetailsDirector(img.id)">-->
-<!--              <figure class="effect-ming tm-video-item">-->
-<!--                <img :src="require('../assets/photos/moyen-' + img.chemin)" alt="Image" class="img-fluid">-->
-<!--                <figcaption class="d-flex align-items-center justify-content-center">-->
-<!--                  <h2>Peace</h2>-->
-<!--                </figcaption>-->
-<!--              </figure>-->
-<!--              <div class="d-flex justify-content-between tm-text-gray">-->
-<!--                <span class="tm-text-gray-light">{{ goodFormatDate(img.datepublication) }}</span>-->
-<!--                <span>21,204 views</span>-->
-<!--              </div>-->
-<!--            </div>-->
+    <modal name="accessImage" :width="1000" :height="1000">
+      <div class="modal-body">
+        <div class="form-title text-center">
 
-<!--          </div>-->
+          <div v-if="imageSelectCrud.datapublic == 'false'">
+            <h4>Souhaitez vous Activer cette image ?</h4>
+            <button @click="activeImage(imageSelectCrud)" type="button" class="btn btn-success">Activé</button>
+          </div>
+          <div v-else>
+          <h4>Souhaitez vous Désactier cette image ?</h4>
+            <button @click="desactiveImage(imageSelectCrud)" type="button" class="btn btn-danger">Désactivé</button>
+          </div>
         </div>
 
+      </div>
+    </modal>
 
-
-      </div> <!-- row -->
-    </div> <!-- container-fluid, tm-container-content -->
 
 
 
@@ -55,17 +105,24 @@
 <script>
 
 import axios from 'axios';
-
+import Vue from 'vue'
+import VModal from 'vue-js-modal'
+Vue.use(VModal)
 
 export default {
   data() {
     return {
-      dataImages : []
+      dataImages : [],
+      imageSelect : [],
+      firstSelect : "false",
+      imageSelectCrud : [],
+      dateSelect : ""
     };
+  },
+  components: {
   },
   created() {
     axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-
   },
   mounted() {
     console.log("Ici")
@@ -92,17 +149,103 @@ export default {
       return dateGoodFormat[2]+"/"+dateGoodFormat[1]+"/"+dateGoodFormat[0]
 
     },
-    photoDetailsDirector(id){
-      console.log("Id de l'image bg")
-      console.log(id)
+    printImage(img) {
+      this.imageSelect = img
+      this.firstSelect = "true"
+    },
+    modifePopup(img) {
+      this.$modal.show('modife');
+      this.imageSelectCrud = img
 
-      localStorage.setItem("idPhotoClick", id)
-      this.$router.push('/photo-details')
+    },
+    modifieData(){
+
+      axios.put("http://localhost:8085/api/v1/images/" + this.imageSelectCrud.id, {
+        datapublic : this.imageSelectCrud.datapublic,
+        archive : this.imageSelectCrud.archive,
+        chemin : this.imageSelectCrud.chemin,
+        description : this.imageSelectCrud.description,
+        datepublication : this.imageSelectCrud.datepublication,
+        dateaccord :this.imageSelectCrud.dateaccord,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+          .then(responseInscription => {
+            console.log("PUT REALISER")
+            console.log(responseInscription.data)
+          })
+          .catch(error => {
+            console.log("erreur")
+            console.log(error)
+          })
+
+
+    },
+    imageAccess(img) {
+      this.$modal.show('accessImage');
+      this.imageSelectCrud = img
+    },
+    desactiveImage(img) {
+
+      axios.put("http://localhost:8085/api/v1/images/data-public/" + img.id, {
+        datapublic : "false",
+
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+          .then(responseInscription => {
+            console.log("PUT DESACTIVER REALISER")
+            console.log(responseInscription.data)
+            this.$router.go(0);
+          })
+          .catch(error => {
+            console.log("erreur")
+            console.log(error)
+          })
+
+    },
+    activeImage(img) {
+      axios.put("http://localhost:8085/api/v1/images/data-public/" + img.id, {
+        datapublic : "true",
+
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+          .then(responseInscription => {
+            console.log("PUT DESACTIVER REALISER")
+            console.log(responseInscription.data)
+            this.$router.go(0);
+          })
+          .catch(error => {
+            console.log("erreur")
+            console.log(error)
+          })
+    },
+    suppImage(img) {
+
+      axios.delete("http://localhost:8085/api/v1/images/" + img.id, {
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+        },
+      })
+          .then(responseInscription => {
+            console.log("DELETE REALISER")
+            console.log(responseInscription.data)
+            this.$router.go(0);
+          })
+          .catch(error => {
+            console.log("erreur")
+            console.log(error)
+          })
+
     }
 
+
   },
-  components: {
-  }
+
 };
 </script>
 

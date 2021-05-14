@@ -36,16 +36,16 @@
             </div>
 
 
-<!--            <div>-->
-<!--              <h3 class="tm-text-gray-dark mb-3">Tags</h3>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Cloud</a>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Bluesky</a>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Nature</a>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Background</a>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Timelapse</a>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Night</a>-->
-<!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Real Estate</a>-->
-<!--            </div>-->
+            <!--            <div>-->
+            <!--              <h3 class="tm-text-gray-dark mb-3">Tags</h3>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Cloud</a>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Bluesky</a>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Nature</a>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Background</a>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Timelapse</a>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Night</a>-->
+            <!--              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Real Estate</a>-->
+            <!--            </div>-->
           </div>
         </div>
       </div>
@@ -77,9 +77,13 @@ export default {
       connexion : false,
       userConnect : [],
       inputImage : [],
+      imgIA : "",
       inputChemin : "",
       inputDescription : "",
-      inputDatapublic : "false"
+      inputDatapublic : "false",
+      faces : [],
+      categories: [],
+      idImage : 0,
     };
   },
   created() {
@@ -117,20 +121,6 @@ export default {
 
 
 
-    axios.get("http://localhost:8082/upload_img=moyen-"+"39624.jpg", {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      }
-    })
-      .then(responseData => {
-        console.log("Get antoines data")
-        console.log(responseData.data.result.tags)
-
-      })
-      .catch(error => {
-        console.log("erreur")
-        console.log(error)
-      })
 
     // let id = localStorage.getItem("idPhotoClick")
     // axios.get("http://localhost:8085/api/v1/images/"+ id, {
@@ -170,6 +160,7 @@ export default {
       const formData = new FormData();
       formData.append('imageFile',this.inputImage , this.inputImage.name);
       formData.append('chemin',this.inputChemin)
+      this.imgIA = this.inputChemin
       formData.append('description',this.inputDescription)
 
 
@@ -182,48 +173,66 @@ export default {
           .then(responseData => {
             console.log("POST REALISER")
             console.log(responseData.data)
+            this.idimage = responseData.data.id
 
 
-
-
-
-
-
-            //------------------ AJOUT DES CATEGORIES ---------------------------//
-
-            axios.post("http://localhost:8085/api/v1/categories", {
-              "idimage": 4,
-              "libelle": "beurk",
-
+            axios.get("http://localhost:8082/upload_img_cat=moyen-"+ this.imgIA +"/face", {
               headers: {
                 'Access-Control-Allow-Origin': '*',
               },
             })
                 .then(responseData => {
-                  console.log("POST CATEGORIE REALISER")
+                  console.log("VISAGES")
                   console.log(responseData.data)
+                  this.faces = responseData.data
+                  console.log(this.faces.result.faces.length)
 
+                  axios.get("http://localhost:8082/upload_img_cat=moyen-"+ this.imgIA +"/cat", {
+                    headers: {
+                      'Access-Control-Allow-Origin': '*',
+                    },
+                  })
+                      .then(responseData => {
+                        console.log("CATEGORIES")
+                        console.log(responseData.data)
+                        this.categories = responseData.data
+                        this.categories["faces"] = this.faces.result.faces.length
+                        console.log('New Categories')
+                        console.log(this.categories)
+
+                        //------------------ AJOUT DES CATEGORIES ---------------------------//
+
+                        axios.post("http://localhost:8085/api/v1/categories", {
+
+                          "idimage": this.idimage,
+                          "libelle": JSON.stringify(this.categories),
+
+                          headers: {
+                            'Access-Control-Allow-Origin': '*',
+                          },
+                        })
+                            .then(responseData => {
+                              console.log("POST CATEGORIE REALISER")
+                              console.log(responseData.data)
+                            })
+                            .catch(error => {
+                              console.log("erreur insertion finale")
+                              console.log(error)
+                            })
+                      })
+                      .catch(error => {
+                        console.log("erreur")
+                        console.log(error)
+                      })
 
                 })
-                .catch(error => {
-                  console.log("erreur")
-                  console.log(error)
-                })
-
-
-
-
-
-
-
-
-
 
           })
           .catch(error => {
             console.log("erreur")
             console.log(error)
           })
+
 
     }
 

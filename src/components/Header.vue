@@ -16,13 +16,14 @@
             <li class="nav-item">
               <a class="nav-link nav-link-1 active" aria-current="page" @click="$router.push('/')">Photos</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link nav-link-2" >Videos</a>
+            <li v-if="userConnect.profil == 'ADMIN'" class="nav-item">
+              <a @click="$router.push('/gestion-users')" class="nav-link nav-link-3" >GESTION USERS</a>
             </li>
 
             <li v-if="userConnect.profil == 'ADMIN'" class="nav-item">
               <a @click="$router.push('/gestion-images')" class="nav-link nav-link-3" >GESTION IMAGES</a>
             </li>
+
 
 
             <li v-if="connexion == false" class="nav-item">

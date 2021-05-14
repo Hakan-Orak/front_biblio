@@ -2,16 +2,6 @@
 	<div>
 
 
-    <div class="tm-hero d-flex justify-content-center align-items-center" data-parallax="scroll"  >
-      <form class="d-flex tm-search-form">
-        <input class="form-control tm-search-input" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success tm-search-btn" type="submit">
-          <i class="fas fa-search"></i>
-        </button>
-      </form>
-    </div>
-
-
     <div class="container-fluid tm-container-content tm-mt-60">
       <div class="row mb-4">
         <h2 class="col-3 tm-text-primary">
@@ -23,8 +13,8 @@
       <div class="row tm-mb-90 tm-gallery">
 
         <div v-for="img in dataImages" :key="img.id" >
-<!--          v-if="img.datapublic === 'true'"-->
-          <div >
+
+          <div v-if="img.datapublic === 'true'">
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-12" @click="photoDetailsDirector(img.id)">
               <figure class="effect-ming tm-video-item">
                 <img :src="require('../assets/photos/moyen-' + img.chemin)" alt="Image" class="img-fluid">
@@ -90,19 +80,6 @@ export default {
     })
 
 
-    axios.get("http://localhost:8082/oui", {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-      }
-    })
-        .then(responseData => {
-          console.log("REGARDE ICI BG")
-          console.log(responseData.data)
-        })
-        .catch(error => {
-          console.log("erreur 2")
-          console.log(error)
-        })
 
 
 

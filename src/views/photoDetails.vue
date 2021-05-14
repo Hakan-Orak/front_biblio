@@ -44,15 +44,12 @@
               <h3 class="tm-text-gray-dark mb-3">Description</h3>
               <p>{{ imageData.description }}</p>
             </div>
+
+            <h3 class="tm-text-gray-dark mb-3">Nombre de personnes : {{ dataCategorie.faces }}</h3>
             <div>
               <h3 class="tm-text-gray-dark mb-3">Tags</h3>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Cloud</a>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Bluesky</a>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Nature</a>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Background</a>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Timelapse</a>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Night</a>
-              <a href="#" class="tm-text-primary mr-4 mb-2 d-inline-block">Real Estate</a>
+              <a v-for="categorie in dataCategorie.result.categories" v class="tm-text-primary mr-4 mb-2 d-inline-block">{{ categorie.name.fr }}</a>
+
             </div>
           </div>
         </div>
@@ -86,6 +83,7 @@ export default {
       imageData : [],
       formatImage : "moyen",
       formatCheminDl : "",
+      dataCategorie : [],
     };
   },
   created() {
@@ -111,6 +109,25 @@ export default {
           console.log("erreur")
           console.log(error)
         })
+
+    axios.get("http://localhost:8085/api/v1/categories/image/"+ id, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
+        .then(responseDataImage => {
+          console.log("CATEGORIES DATA")
+          console.log(responseDataImage.data)
+          this.dataCategorie = JSON.parse(responseDataImage.data.libelle)
+          console.log(this.dataCategorie)
+        })
+        .catch(error => {
+          console.log("erreur")
+          console.log(error)
+        })
+
+
+
   },
   methods: {
 
@@ -142,7 +159,7 @@ export default {
       let pictureLink = require('../assets/photos/'+ this.formatCheminDl +'-' + this.imageData.chemin)
       console.log(pictureLink)
 
-      var fileURL = 'http://localhost:8082' + pictureLink;
+      var fileURL = 'http://localhost:8083/' + pictureLink;
       var fileLink = document.createElement('a');
 
       console.log();
@@ -154,13 +171,11 @@ export default {
       document.body.appendChild(fileLink);
 
       fileLink.click();
-
     },
 
 
     downloadZippicture(){
       let zip = new jszip();
-      zip.file("Hello.txt", "Hello World\n");
 
       if (this.formatImage == 'petit') {
         this.formatCheminDl = "petit"
@@ -172,21 +187,10 @@ export default {
 
 
 
-
-
-
-
-
-
-
-
-
-
-      zip.file("Goodbye.txt", "Goodbye, cruel world\n");
       let middle_picture = document.getElementById('middle_picture')
       let small_picture = document.getElementById('small_picture')
       let big_picture = document.getElementById('big_picture')
-      // .getAttribute("data");
+
       let dataImage_middle = this.getBase64Image(middle_picture)
       let dataImage_small = this.getBase64Image(small_picture)
       let dataImage_big = this.getBase64Image(big_picture)
